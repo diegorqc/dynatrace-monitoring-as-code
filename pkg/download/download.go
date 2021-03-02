@@ -31,9 +31,9 @@ import (
 var cont = 0
 
 //GetConfigsFilterByEnvironment filters the enviroments list based on specificEnvironment flag value
-func GetConfigsFilterByEnvironment(workingDir string, fileReader util.FileReader, environmentsFile string,
+func GetConfigsFilterByEnvironment(workingDir string, fileManager files.FileManager, environmentsFile string,
 	specificEnvironment string, downloadSpecificAPI string) error {
-	environments, errors := environment.LoadEnvironmentList(specificEnvironment, environmentsFile, fileReader)
+	environments, errors := environment.LoadEnvironmentList(specificEnvironment, environmentsFile, fileManager)
 	if len(errors) > 0 {
 		for _, err := range errors {
 			util.Log.Error("Error while getting enviroments ", err)
