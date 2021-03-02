@@ -24,27 +24,27 @@ import (
 
 //go:generate mockgen -source=creator.go -destination=creator_mock.go -package=files FileCreator
 
-//FileCreator is an interface to encapsulate the file creation process. Is has 2 implementations
+//FileManager is an interface to encapsulate the file creation process. Is has 2 implementations
 //in memory and one that uses files on disk.
-type FileCreator interface {
+type FileManager interface {
 	CreateFolder(path string) (fullpath string, err error)
 	CreateFile(byteArray []byte, path string, name string, fileType string) (cleanName string, err error)
 }
 
 // fileCreatorImpl implements interface FileCreator using disk as storage
-type fileCreator struct {
+type fileManager struct {
 	fileManager afero.Fs
 }
 
-//NewDiskFileCreator creates a new FileCreator instance
-func NewDiskFileCreator() FileCreator {
-	el := &fileCreator{}
+//NewDiskFileManager creates a new FileCreator instance
+func NewDiskFileManager() FileManager {
+	el := &fileManager{}
 	el.fileManager = afero.NewOsFs()
 	return el
 }
 
 //CreateFolder creates a folder in the specified path
-func (a *fileCreator) CreateFolder(path string) (fullpath string, err error) {
+func (a *fileManager) CreateFolder(path string) (fullpath string, err error) {
 	//path should be sanitized
 	exist, err := afero.Exists(a.fileManager, path)
 	if !exist && err == nil {
@@ -57,7 +57,7 @@ func (a *fileCreator) CreateFolder(path string) (fullpath string, err error) {
 }
 
 //CreateFile allows to write a file on disk using the specified path
-func (a *fileCreator) CreateFile(byteArray []byte, path string, name string, fileType string) (cleanName string, err error) {
+func (a *fileManager) CreateFile(byteArray []byte, path string, name string, fileType string) (cleanName string, err error) {
 	cleanName = sanitizeName(name)
 	fullPath := filepath.Join(path, cleanName+fileType)
 	err = afero.WriteFile(a.fileManager, fullPath, byteArray, 0664)
@@ -68,9 +68,9 @@ func (a *fileCreator) CreateFile(byteArray []byte, path string, name string, fil
 	return cleanName, nil
 }
 
-//NewInMemoryFileCreator creates  a new instance of FileCreator
-func NewInMemoryFileCreator() FileCreator {
-	el := &fileCreator{}
+//NewInMemoryFileManager creates  a new instance of FileCreator
+func NewInMemoryFileManager() FileManager {
+	el := &fileManager{}
 	el.fileManager = afero.NewMemMapFs()
 	return el
 }

@@ -99,7 +99,7 @@ func getAPIList(downloadSpecificAPI string) (filterAPIList map[string]api.Api, e
 func downloadConfigFromEnvironment(environment environment.Environment, basepath string, listApis map[string]api.Api) (err error) {
 	projectName := environment.GetId()
 	path := filepath.Join(basepath, projectName)
-	creator := files.NewDiskFileCreator()
+	creator := files.NewDiskFileManager()
 
 	util.Log.Info("Creating base project name %s", projectName)
 	fullpath, err := creator.CreateFolder(path)
@@ -130,7 +130,7 @@ func downloadConfigFromEnvironment(environment environment.Environment, basepath
 	return nil
 }
 
-func createConfigsFromAPI(api api.Api, token string, creator files.FileCreator, fullpath string, client rest.DynatraceClient,
+func createConfigsFromAPI(api api.Api, token string, creator files.FileManager, fullpath string, client rest.DynatraceClient,
 	jcreator jsoncreator.JSONCreator, ycreator yamlcreator.YamlCreator) (err error) {
 	//retrieves all objects for the specific api
 	values, err := client.List(api)

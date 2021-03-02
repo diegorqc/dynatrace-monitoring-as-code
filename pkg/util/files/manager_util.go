@@ -23,8 +23,8 @@ import (
 )
 
 //CreateFileCreatorMockFactory returns a mock version of the filecreator interface
-func CreateFileCreatorMockFactory(t *testing.T) *MockFileCreator {
+func CreateFileManagerMockFactory(t *testing.T) *MockFileManager {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
-	return NewMockFileCreator(mockCtrl)
+	return NewMockFileManager(mockCtrl)
 }
