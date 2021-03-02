@@ -16,6 +16,7 @@ package files
 
 import (
 	"log"
+	"os"
 	"path/filepath"
 	"regexp"
 
@@ -29,6 +30,8 @@ import (
 type FileManager interface {
 	CreateFolder(path string) (fullpath string, err error)
 	CreateFile(byteArray []byte, path string, name string, fileType string) (cleanName string, err error)
+	ReadFile(path string) (content []byte, err error)
+	ReadDir(path string) (dir []os.FileInfo, err error)
 }
 
 // fileCreatorImpl implements interface FileCreator using disk as storage
@@ -66,6 +69,20 @@ func (a *fileManager) CreateFile(byteArray []byte, path string, name string, fil
 	}
 
 	return cleanName, nil
+}
+func (a *fileManager) ReadFile(path string) (content []byte, err error) {
+	file, err := afero.ReadFile(a.fileManager, path)
+	if err != nil {
+		return nil, err
+	}
+	return file, nil
+}
+func (a *fileManager) ReadDir(path string) (dir []os.FileInfo, err error) {
+	dir, err = afero.ReadDir(a.fileManager, path)
+	if dir != nil {
+		return nil, err
+	}
+	return dir, nil
 }
 
 //NewInMemoryFileManager creates  a new instance of FileCreator
