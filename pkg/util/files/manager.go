@@ -23,10 +23,7 @@ import (
 	"github.com/spf13/afero"
 )
 
-//go:generate mockgen -source=creator.go -destination=creator_mock.go -package=files FileCreator
-
-//FileManager is an interface to encapsulate the file creation process. Is has 2 implementations
-//in memory and one that uses files on disk.
+//FileManager is an interface to encapsulate the file read/creation process. It has 2 implementations
 type FileManager interface {
 	CreateFolder(path string) (fullpath string, err error)
 	CreateFile(byteArray []byte, path string, name string, fileType string) (cleanName string, err error)
@@ -34,12 +31,12 @@ type FileManager interface {
 	ReadDir(path string) (dir []os.FileInfo, err error)
 }
 
-// fileCreatorImpl implements interface FileCreator using disk as storage
+// fileManager implements interface FileManager
 type fileManager struct {
 	fileManager afero.Fs
 }
 
-//NewDiskFileManager creates a new FileCreator instance
+//NewDiskFileManager creates a new FileManager instance with disk storage
 func NewDiskFileManager() FileManager {
 	el := &fileManager{}
 	el.fileManager = afero.NewOsFs()
@@ -85,14 +82,14 @@ func (a *fileManager) ReadDir(path string) (dir []os.FileInfo, err error) {
 	return dir, nil
 }
 
-//NewInMemoryFileManager creates  a new instance of FileCreator
+//NewInMemoryFileManager creates  a new instance of FileCreator that reads the files from disk and stores them in a virtual file tree
 func NewInMemoryFileManager() FileManager {
 	el := &fileManager{}
 	el.fileManager = afero.NewMemMapFs()
 	return el
 }
 
-//SanitizeName removes special characters and max 50 characters in name, no special characters
+//SanitizeName removes special characters, limits to max 50 characters in name, no special characters
 func sanitizeName(name string) string {
 	reg, err := regexp.Compile("[^a-zA-Z0-9-]+")
 	if err != nil {

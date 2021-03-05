@@ -40,7 +40,7 @@ func TestGetConfigs(t *testing.T) {
 }
 func TestCreateConfigsFromAPI(t *testing.T) {
 	apiMock := api.CreateAPIMockFactory(t)
-	fcreator := files.CreateFileCreatorMockFactory(t)
+	fcreator := files.CreateFileManagerMockFactory(t)
 	client := rest.CreateDynatraceClientMockFactory(t)
 	jcreator := jsoncreator.CreateJSONCreatorMock(t)
 	ycreator := yamlcreator.CreateYamlCreatorMock(t)
