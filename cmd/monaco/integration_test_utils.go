@@ -164,14 +164,15 @@ func cleanupIntegrationTest(t *testing.T, envFile, suffix string, integrationTes
 //
 // <original name>_<current timestamp><defined suffix>
 // e.g. my-config_1605258980000_Suffix
+
 func RunIntegrationWithCleanup(t *testing.T, configFolder, envFile, suffixTest string, testFunc func(fileManager files.FileManager)) {
 
 	suffix := getTimestamp() + suffixTest
-	//transformers := []func(string) string{getTransformerFunc(suffix)}
+	transformers := []func(string) string{getTransformerFunc(suffix)}
 
 	//var integrationTestReader, err = files.NewInMemoryFileManager(configFolder, transformers)
-	var integrationTestReader = files.NewInMemoryFileManager()
-
-	testFunc(integrationTestReader)
-	cleanupIntegrationTest(t, envFile, suffix, integrationTestReader)
+	var fileManager = files.NewInMemoryFileManager()
+	RewriteConfigNames(configFolder, fileManager, transformers)
+	testFunc(fileManager)
+	cleanupIntegrationTest(t, envFile, suffix, fileManager)
 }

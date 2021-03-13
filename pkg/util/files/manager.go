@@ -29,6 +29,7 @@ import (
 type FileManager interface {
 	CreateFolder(path string) (fullpath string, err error)
 	CreateFile(byteArray []byte, path string, name string, fileType string) (cleanName string, err error)
+	CreateEmptyFile(filename string) (afero.File, error)
 	ReadFile(path string) (content []byte, err error)
 	ReadDir(path string) (dir []os.FileInfo, err error)
 }
@@ -66,9 +67,16 @@ func (a *fileManager) CreateFile(byteArray []byte, path string, name string, fil
 	if err != nil {
 		return "", err
 	}
-
 	return cleanName, nil
 }
+func (a *fileManager) CreateEmptyFile(filename string) (afero.File, error) {
+	file, err := a.fileManager.Create(filename)
+	if err != nil {
+		return nil, err
+	}
+	return file, nil
+}
+
 func (a *fileManager) ReadFile(path string) (content []byte, err error) {
 	file, err := afero.ReadFile(a.fileManager, path)
 	if err != nil {
