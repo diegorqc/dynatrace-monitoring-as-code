@@ -76,16 +76,18 @@ func (a *fileManager) ReadFile(path string) (content []byte, err error) {
 }
 func (a *fileManager) ReadDir(path string) (dir []os.FileInfo, err error) {
 	dir, err = afero.ReadDir(a.fileManager, path)
-	if dir != nil {
+	if err != nil {
 		return nil, err
 	}
 	return dir, nil
 }
 
-//NewInMemoryFileManager creates  a new instance of FileCreator that reads the files from disk and stores them in a virtual file tree
+//NewInMemoryFileManager creates  a new instance of FileCreator that reads the files from disk and stores them in a virtual file system
 func NewInMemoryFileManager() FileManager {
 	el := &fileManager{}
-	el.fileManager = afero.NewMemMapFs()
+	base := afero.NewOsFs()
+	baseLayer := afero.NewReadOnlyFs(base)
+	el.fileManager = afero.NewCopyOnWriteFs(baseLayer, afero.NewMemMapFs())
 	return el
 }
 
