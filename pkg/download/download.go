@@ -40,12 +40,12 @@ func GetConfigsFilterByEnvironment(workingDir string, fileManager files.FileMana
 		}
 		return fmt.Errorf("There were some errors while getting environment files")
 	}
-	return getConfigs(workingDir, environments, downloadSpecificAPI)
+	return getConfigs(fileManager, workingDir, environments, downloadSpecificAPI)
 
 }
 
 //getConfigs Entry point that retrieves the specified configurations from a Dynatrace tenant
-func getConfigs(workingDir string, environments map[string]environment.Environment, downloadSpecificAPI string) error {
+func getConfigs(fileManager files.FileManager, workingDir string, environments map[string]environment.Environment, downloadSpecificAPI string) error {
 	list, err := getAPIList(downloadSpecificAPI)
 	if err != nil {
 		return err
@@ -53,7 +53,7 @@ func getConfigs(workingDir string, environments map[string]environment.Environme
 	isError := false
 	for _, environment := range environments {
 		//download configs for each environment
-		err := downloadConfigFromEnvironment(environment, workingDir, list)
+		err := downloadConfigFromEnvironment(fileManager, environment, workingDir, list)
 		if err != nil {
 			util.Log.Error("error while downloading configs for environment %v %v", environment.GetId())
 			isError = true
@@ -96,13 +96,12 @@ func getAPIList(downloadSpecificAPI string) (filterAPIList map[string]api.Api, e
 }
 
 //creates the project and downloads the configs
-func downloadConfigFromEnvironment(environment environment.Environment, basepath string, listApis map[string]api.Api) (err error) {
+func downloadConfigFromEnvironment(fileManager files.FileManager, environment environment.Environment, basepath string, listApis map[string]api.Api) (err error) {
 	projectName := environment.GetId()
 	path := filepath.Join(basepath, projectName)
-	creator := files.NewDiskFileManager()
 
 	util.Log.Info("Creating base project name %s", projectName)
-	fullpath, err := creator.CreateFolder(path)
+	fullpath, err := fileManager.CreateFolder(path)
 	if err != nil {
 		util.Log.Error("error creating folder for enviroment %v %v", projectName, err)
 		return err
@@ -121,7 +120,7 @@ func downloadConfigFromEnvironment(environment environment.Environment, basepath
 		util.Log.Info(" --- GETTING CONFIGS for %s", api.GetId())
 		jcreator := jsoncreator.NewJSONCreator()
 		ycreator := yamlcreator.NewYamlConfig()
-		errorAPI := createConfigsFromAPI(api, token, creator, fullpath, client, jcreator, ycreator)
+		errorAPI := createConfigsFromAPI(api, token, fileManager, fullpath, client, jcreator, ycreator)
 		if errorAPI != nil {
 			util.Log.Error("error getting configs from API %v %v", api.GetId())
 		}

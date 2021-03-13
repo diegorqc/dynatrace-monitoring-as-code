@@ -23,6 +23,8 @@ import (
 	"github.com/spf13/afero"
 )
 
+//go:generate mockgen -source=manager.go -destination=manager_mock.go -package=files FileManager
+
 //FileManager is an interface to encapsulate the file read/creation process. It has 2 implementations
 type FileManager interface {
 	CreateFolder(path string) (fullpath string, err error)
