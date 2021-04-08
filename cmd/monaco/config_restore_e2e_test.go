@@ -43,7 +43,7 @@ import (
 
 //This version runs the test against 2 simple configs (alerting profiles and management zones)
 func TestRestoreConfigsSimple(t *testing.T) {
-	initialConfigsFolder := "test-resources/integration-download-configs/"
+	initialConfigsFolder := "test-resources/integration-download-configs/simple-project/"
 	envFile := initialConfigsFolder + "environments.yaml"
 	downloadFolder := "test-resources/download"
 	subsetOfConfigsToDownload := "alerting-profile,management-zone"

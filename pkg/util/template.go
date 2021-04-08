@@ -19,6 +19,7 @@ package util
 import (
 	"bytes"
 	"os"
+	"path/filepath"
 	"strings"
 	"text/template"
 
@@ -49,9 +50,10 @@ func NewTemplateFromString(name string, content string) (Template, error) {
 }
 
 // NewTemplate creates a new template for the given file
-func NewTemplate(fs afero.Fs, fileName string) (Template, error) {
-	data, err := afero.ReadFile(fs, fileName)
+func NewTemplate(fs afero.IOFS, fileName string) (Template, error) {
+	cleanedFilename := filepath.Clean(fileName)
 
+	templ, err := template.ParseFS(fs, cleanedFilename)
 	if err != nil {
 		return nil, err
 	}
