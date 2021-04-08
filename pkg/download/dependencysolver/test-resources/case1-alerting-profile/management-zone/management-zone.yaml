@@ -1,0 +1,5 @@
+config:
+- supermg: supermg.json
+
+supermg:
+- name: supermg
