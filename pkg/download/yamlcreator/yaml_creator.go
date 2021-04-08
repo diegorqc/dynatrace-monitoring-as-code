@@ -17,6 +17,7 @@ package yamlcreator
 import (
 	"path/filepath"
 
+	"github.com/dynatrace-oss/dynatrace-monitoring-as-code/pkg/download/jsoncreator"
 	"github.com/dynatrace-oss/dynatrace-monitoring-as-code/pkg/util"
 	"github.com/spf13/afero"
 	"gopkg.in/yaml.v2"
@@ -28,6 +29,7 @@ import (
 type YamlCreator interface {
 	CreateYamlFile(fs afero.Fs, path string, name string) error
 	AddConfig(name string, rawName string)
+	AddDependencies(fs afero.Fs, path string, configs map[string][]jsoncreator.DependencyConfig) error
 }
 
 //YamlConfig defines the structure for the config file for each API
@@ -73,4 +75,56 @@ func (yc *YamlConfig) CreateYamlFile(fs afero.Fs, path string, name string) erro
 		return err
 	}
 	return nil
+}
+
+func (yc *YamlConfig) AddDependencies(fs afero.Fs, path string, configs map[string][]jsoncreator.DependencyConfig) error {
+	configName := filepath.Base(filepath.Dir(path))
+	yamlParameters, exist := configs[configName]
+	if exist {
+		file, err := afero.ReadFile(fs, path)
+		if err != nil {
+			util.Log.Error("error reading file %s", path)
+			return err
+		}
+		file, err = addConfigsToYaml(file, yamlParameters)
+		if err != nil {
+			util.Log.Error("error setting configs in yaml %s", path)
+			return err
+		}
+		err = afero.WriteFile(fs, path, file, 0664)
+		if err != nil {
+			util.Log.Error("error writing configs in yaml %s", path)
+			return err
+		}
+	}
+	return nil
+}
+
+func addConfigsToYaml(file []byte, parameters []jsoncreator.DependencyConfig) ([]byte, error) {
+
+	var yc2 = make(map[string]interface{})
+	if err := yaml.Unmarshal(file, &yc2); err != nil {
+		return nil, err
+	}
+	for _, parameter := range parameters {
+
+		subValues, exist := yc2[parameter.JsonName]
+		if exist {
+			castValues := subValues.([]interface{})
+			par := make(map[string]string)
+			par[parameter.Name] = parameter.Value
+			castValues = append(castValues, par)
+			yc2[parameter.JsonName] = castValues
+
+			file, err := yaml.Marshal(yc2)
+			if err != nil {
+				util.Log.Error("error parsing yaml file: %v", err)
+				return nil, err
+			}
+			return file, nil
+		}
+
+	}
+
+	return file, nil
 }

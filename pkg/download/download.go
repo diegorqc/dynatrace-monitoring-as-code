@@ -20,6 +20,7 @@ import (
 	"strings"
 
 	"github.com/dynatrace-oss/dynatrace-monitoring-as-code/pkg/api"
+	"github.com/dynatrace-oss/dynatrace-monitoring-as-code/pkg/download/dependencysolver"
 	"github.com/dynatrace-oss/dynatrace-monitoring-as-code/pkg/download/jsoncreator"
 	"github.com/dynatrace-oss/dynatrace-monitoring-as-code/pkg/download/yamlcreator"
 	"github.com/dynatrace-oss/dynatrace-monitoring-as-code/pkg/environment"
@@ -55,10 +56,11 @@ func getConfigs(fs afero.Fs, workingDir string, environments map[string]environm
 		//download configs for each environment
 		err := downloadConfigFromEnvironment(fs, environment, workingDir, list)
 		if err != nil {
-			util.Log.Error("error while downloading configs for environment %v %v", environment.GetId())
+			util.Log.Error("error while downloading configs for environment %s", environment.GetId())
 			isError = true
 		}
 	}
+
 	if isError {
 		return fmt.Errorf("There were some errors while downloading the environment configs, please check the logs")
 	}
@@ -116,14 +118,22 @@ func downloadConfigFromEnvironment(fs afero.Fs, environment environment.Environm
 		util.Log.Error("error creating dynatrace client for enviroment %v %v", projectName, err)
 		return err
 	}
+	jcreator := jsoncreator.NewJSONCreator()
+	ycreator := yamlcreator.NewYamlConfig()
+	solver := dependencysolver.NewDependencySolver()
 	for _, api := range listApis {
 		util.Log.Info(" --- GETTING CONFIGS for %s", api.GetId())
-		jcreator := jsoncreator.NewJSONCreator()
-		ycreator := yamlcreator.NewYamlConfig()
+
 		errorAPI := createConfigsFromAPI(fs, api, token, path, client, jcreator, ycreator)
 		if errorAPI != nil {
-			util.Log.Error("error getting configs from API %v %v", api.GetId())
+			util.Log.Error("error getting configs from API %v", api.GetId())
 		}
+	}
+
+	err = solver.ProcessDownloadedFiles(fs, jcreator, ycreator, path, projectName)
+	if err != nil {
+		util.Log.Error("Error replacing dependencies for environment %v %v", projectName, err)
+		return err
 	}
 	util.Log.Info("END downloading info %s", projectName)
 	return nil
