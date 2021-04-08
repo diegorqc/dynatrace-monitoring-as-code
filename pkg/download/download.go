@@ -20,6 +20,7 @@ import (
 	"strings"
 
 	"github.com/dynatrace-oss/dynatrace-monitoring-as-code/pkg/api"
+	"github.com/dynatrace-oss/dynatrace-monitoring-as-code/pkg/download/dependencysolver"
 	"github.com/dynatrace-oss/dynatrace-monitoring-as-code/pkg/download/jsoncreator"
 	"github.com/dynatrace-oss/dynatrace-monitoring-as-code/pkg/download/yamlcreator"
 	"github.com/dynatrace-oss/dynatrace-monitoring-as-code/pkg/environment"
@@ -122,8 +123,13 @@ func downloadConfigFromEnvironment(fs afero.IOFS, environment environment.Enviro
 		ycreator := yamlcreator.NewYamlConfig()
 		errorAPI := createConfigsFromAPI(fs, api, token, path, client, jcreator, ycreator)
 		if errorAPI != nil {
-			util.Log.Error("error getting configs from API %v %v", api.GetId())
+			util.Log.Error("error getting configs from API %v", api.GetId())
 		}
+	}
+	err = dependencysolver.ProcessDownloadedFiles(fs, path, projectName)
+	if err != nil {
+		util.Log.Error("Error replacing dependencies for environment %v %v", projectName, err)
+		return err
 	}
 	util.Log.Info("END downloading info %s", projectName)
 	return nil

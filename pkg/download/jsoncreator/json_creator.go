@@ -110,17 +110,17 @@ func processJSONFile(dat map[string]interface{}, id string, name string, api api
 //replaceKeyProperties replaces name or displayname for each config
 func replaceKeyProperties(dat map[string]interface{}) map[string]interface{} {
 	//removes id field
-	delete(dat, "id")
+	//delete(dat, "id")
 	if dat["name"] != nil {
 		dat["name"] = "{{.name}}"
 	}
 	if dat["displayName"] != nil {
 		dat["displayName"] = "{{.name}}"
 	}
-	//for reports
-	if dat["dashboardId"] != nil {
-		dat["dashboardId"] = "{{.name}}"
-	}
+	// //for reports
+	// if dat["dashboardId"] != nil {
+	// 	dat["dashboardId"] = "{{.name}}"
+	// }
 	return dat
 }
 

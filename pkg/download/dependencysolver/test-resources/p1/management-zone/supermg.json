@@ -1,0 +1,34 @@
+{
+ "description": null,
+ "dimensionalRules": [],
+ "entitySelectorBasedRules": [],
+ "id": "2058661211851054936",
+ "metadata": {
+  "clusterVersion": "1.215.55.20210402-140730",
+  "configurationVersions": [
+   0
+  ]
+ },
+ "name": "{{.name}}",
+ "rules": [
+  {
+   "conditions": [
+    {
+     "comparisonInfo": {
+      "caseSensitive": true,
+      "negate": false,
+      "operator": "BEGINS_WITH",
+      "type": "STRING",
+      "value": "appsuper"
+     },
+     "key": {
+      "attribute": "PROCESS_GROUP_NAME"
+     }
+    }
+   ],
+   "enabled": true,
+   "propagationTypes": [],
+   "type": "SERVICE"
+  }
+ ]
+}
