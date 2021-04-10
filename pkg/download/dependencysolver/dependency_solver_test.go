@@ -16,55 +16,48 @@
 
 package dependencysolver
 
-import (
-	"testing"
+// func TestProcessDownloadedFiles(t *testing.T) {
+// 	fs := util.CreateTestFileSystem()
+// 	//test for error
+// 	badbasePath := "/test-resources/p1"
+// 	err := ProcessDownloadedFiles(fs, badbasePath, "demo")
+// 	assert.Error(t, err, "Not a valid path /test-resources/p1")
+// }
 
-	"github.com/dynatrace-oss/dynatrace-monitoring-as-code/pkg/util"
-	"gotest.tools/assert"
-)
+// func TestGatherAndReplaceIds(t *testing.T) {
+// 	fs := util.CreateTestFileSystem()
+// 	basePath := "./test-resources/case1-alerting-profile"
+// 	filesIds, err := gatherAndReplaceIds(fs, basePath)
+// 	assert.NilError(t, err)
+// 	entity1 := FileInfo{
+// 		Name: "2058661211851054936",
+// 		Path: "management-zone/supermg.json",
+// 		Id:   "supermg.json"}
+// 	assert.Equal(t, len(filesIds), 3)
+// 	assert.Equal(t, filesIds[entity1.Name].Id, "supermg.json")
+// }
+// func TestReplaceDependencies(t *testing.T) {
+// 	fs := util.CreateTestFileSystem()
+// 	basePath := "./test-resources/case1-alerting-profile"
+// 	filesIds := make(map[string]FileInfo)
+// 	filesIds["2058661211851054936"] = FileInfo{
+// 		Name: "super-mgzone",
+// 		Id:   "2058661211851054936",
+// 		Path: "management-zone/supermg"}
+// 	filesIds["2058661211851054800"] = FileInfo{
+// 		Name: "super-mgzone",
+// 		Id:   "2058661211851054800",
+// 		Path: "management-zone/supermg2"}
 
-func TestProcessDownloadedFiles(t *testing.T) {
-	fs := util.CreateTestFileSystem()
-	//test for error
-	badbasePath := "/test-resources/p1"
-	err := ProcessDownloadedFiles(fs, badbasePath, "demo")
-	assert.Error(t, err, "Not a valid path /test-resources/p1")
-}
+// 	depsForConfig, err := replaceDependencies(fs, basePath, filesIds)
+// 	assert.NilError(t, err)
+// 	assert.Equal(t, len(depsForConfig["alerting-profile"]), 2)
+// 	assert.Equal(t, depsForConfig["alerting-profile"][0].Name, "managementZoneId")
+// 	assert.Equal(t, depsForConfig["alerting-profile"][0].Value, "management-zone/supermg2")
+// 	assert.Equal(t, depsForConfig["alerting-profile"][1].Name, "mzId")
+// 	assert.Equal(t, depsForConfig["alerting-profile"][1].Value, "management-zone/supermg")
 
-func TestGatherAndReplaceIds(t *testing.T) {
-	fs := util.CreateTestFileSystem()
-	basePath := "./test-resources/case1-alerting-profile"
-	filesIds, err := gatherAndReplaceIds(fs, basePath)
-	assert.NilError(t, err)
-	entity1 := FileInfo{
-		Name: "2058661211851054936",
-		Path: "management-zone/supermg.json",
-		Id:   "supermg.json"}
-	assert.Equal(t, len(filesIds), 3)
-	assert.Equal(t, filesIds[entity1.Name].Id, "supermg.json")
-}
-func TestReplaceDependencies(t *testing.T) {
-	fs := util.CreateTestFileSystem()
-	basePath := "./test-resources/case1-alerting-profile"
-	filesIds := make(map[string]FileInfo)
-	filesIds["2058661211851054936"] = FileInfo{
-		Name: "super-mgzone",
-		Id:   "2058661211851054936",
-		Path: "management-zone/supermg"}
-	filesIds["2058661211851054800"] = FileInfo{
-		Name: "super-mgzone",
-		Id:   "2058661211851054800",
-		Path: "management-zone/supermg2"}
-
-	depsForConfig, err := replaceDependencies(fs, basePath, filesIds)
-	assert.NilError(t, err)
-	assert.Equal(t, len(depsForConfig["alerting-profile"]), 2)
-	assert.Equal(t, depsForConfig["alerting-profile"][0].Name, "managementZoneId")
-	assert.Equal(t, depsForConfig["alerting-profile"][0].Value, "management-zone/supermg2")
-	assert.Equal(t, depsForConfig["alerting-profile"][1].Name, "mzId")
-	assert.Equal(t, depsForConfig["alerting-profile"][1].Value, "management-zone/supermg")
-
-}
+// }
 
 // func TestAddConfigsToYaml() {
 // 	//fs := util.CreateTestFileSystem()

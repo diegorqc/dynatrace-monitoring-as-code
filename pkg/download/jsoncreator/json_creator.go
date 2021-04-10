@@ -35,7 +35,7 @@ import (
 type JSONCreator interface {
 	CreateJSONConfig(fs afero.Fs, client rest.DynatraceClient, api api.Api, value api.Value,
 		path string) (name string, cleanName string, filter bool, err error)
-	TransformJSONToMonacoFormat(fs afero.Fs, path string, basepath string, filename string) error
+	TransformJSONToMonacoFormat(fs afero.Fs, path string, basepath string, filename string, envName string) error
 	ReplaceDependenciesInFile(fs afero.Fs, path string, filename string) error
 	GetDependencies() map[string][]DependencyConfig
 }
@@ -204,12 +204,13 @@ func getKeywordId(configPath string) string {
 	}
 	return "id"
 }
-func (d *JsonCreatorImp) TransformJSONToMonacoFormat(fs afero.Fs, path string, basepath string, filename string) error {
+func (d *JsonCreatorImp) TransformJSONToMonacoFormat(fs afero.Fs, path string, basepath string, filename string, envName string) error {
 	file, err := afero.ReadFile(fs, path)
 	if err != nil {
 		util.Log.Debug("error reading file %s", path)
 		return err
 	}
+	basepath = strings.TrimRight(basepath, envName)
 	configPath, err := filepath.Rel(basepath, path)
 	if err != nil {
 		util.Log.Debug("error getting relative path %s", path)
