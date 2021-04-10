@@ -45,7 +45,7 @@ func (d *DependencySolverImp) ProcessDownloadedFiles(fs afero.Fs, jcreator jsonc
 	if !validPath {
 		return errors.Errorf("Not a valid path %s", path)
 	}
-	err = gatherAndReplaceIds(fs, jcreator, path)
+	err = gatherAndReplaceIds(fs, jcreator, path, envName)
 	if err != nil {
 		util.Log.Error("error while replacing ids for downloaded configs")
 		return err
@@ -64,11 +64,11 @@ func (d *DependencySolverImp) ProcessDownloadedFiles(fs afero.Fs, jcreator jsonc
 }
 
 //gatherAndReplaceIds gathers the ids and paths for all the downloaded configs and then deletes them from the files
-func gatherAndReplaceIds(fs afero.Fs, jcreator jsoncreator.JSONCreator, basepath string) (err error) {
+func gatherAndReplaceIds(fs afero.Fs, jcreator jsoncreator.JSONCreator, basepath string, envName string) (err error) {
 
 	err = afero.Walk(fs, basepath, func(path string, info os.FileInfo, err error) error {
 		if !info.IsDir() && strings.Contains(info.Name(), ".json") {
-			jcreator.TransformJSONToMonacoFormat(fs, path, basepath, info.Name())
+			jcreator.TransformJSONToMonacoFormat(fs, path, basepath, info.Name(), envName)
 			if err != nil {
 				util.Log.Error("error transforming json %s", err)
 				return err

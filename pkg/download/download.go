@@ -118,18 +118,20 @@ func downloadConfigFromEnvironment(fs afero.Fs, environment environment.Environm
 		util.Log.Error("error creating dynatrace client for enviroment %v %v", projectName, err)
 		return err
 	}
-	jcreator := jsoncreator.NewJSONCreator()
-	ycreator := yamlcreator.NewYamlConfig()
+
 	solver := dependencysolver.NewDependencySolver()
 	for _, api := range listApis {
 		util.Log.Info(" --- GETTING CONFIGS for %s", api.GetId())
-
+		jcreator := jsoncreator.NewJSONCreator()
+		ycreator := yamlcreator.NewYamlConfig()
 		errorAPI := createConfigsFromAPI(fs, api, token, path, client, jcreator, ycreator)
 		if errorAPI != nil {
 			util.Log.Error("error getting configs from API %v", api.GetId())
 		}
 	}
-
+	//new set of fresh creators for dependency replacements
+	jcreator := jsoncreator.NewJSONCreator()
+	ycreator := yamlcreator.NewYamlConfig()
 	err = solver.ProcessDownloadedFiles(fs, jcreator, ycreator, path, projectName)
 	if err != nil {
 		util.Log.Error("Error replacing dependencies for environment %v %v", projectName, err)
