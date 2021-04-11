@@ -71,6 +71,7 @@ func getConfigs(fs afero.Fs, workingDir string, environments map[string]environm
 //returns the list of API filter if the download specific flag is used, otherwise returns all the API's
 func getAPIList(downloadSpecificAPI string) (filterAPIList map[string]api.Api, err error) {
 	availableApis := api.NewApis()
+	availableApis = removeDeprecatedApis(availableApis)
 	noFilterAPIListProvided := strings.TrimSpace(downloadSpecificAPI) == ""
 
 	if noFilterAPIListProvided {
@@ -81,7 +82,7 @@ func getAPIList(downloadSpecificAPI string) (filterAPIList map[string]api.Api, e
 	filterAPIList = make(map[string]api.Api)
 	for _, id := range requestedApis {
 		cleanAPI := strings.TrimSpace(id)
-		isAPI := api.IsApi(cleanAPI)
+		isAPI := api.IsApi(cleanAPI) && isNotDeprecated(cleanAPI)
 		if !isAPI {
 			util.Log.Error("Value %s is not a valid API name", cleanAPI)
 			isErr = true
@@ -95,6 +96,19 @@ func getAPIList(downloadSpecificAPI string) (filterAPIList map[string]api.Api, e
 	}
 
 	return filterAPIList, nil
+}
+
+//removeDeprecatedApis removes from the list the apis that shouldn't be used for download
+func removeDeprecatedApis(apis map[string]api.Api) map[string]api.Api {
+	delete(apis, "application")
+	return apis
+}
+func isNotDeprecated(api string) bool {
+	if api == "application" {
+		util.Log.Error("Value application is deprecated, use application-web instead")
+		return false
+	}
+	return true
 }
 
 //creates the project and downloads the configs
