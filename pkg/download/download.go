@@ -119,17 +119,17 @@ func downloadConfigFromEnvironment(fs afero.Fs, environment environment.Environm
 	util.Log.Info("Creating base project name %s", projectName)
 	err = fs.MkdirAll(path, 0777)
 	if err != nil {
-		util.Log.Error("error creating folder for enviroment %v %v", projectName, err)
+		util.Log.Error("error creating folder for environment %v %v", projectName, err)
 		return err
 	}
 	token, err := environment.GetToken()
 	if err != nil {
-		util.Log.Error("error retrieving token for enviroment %v %v", projectName, err)
+		util.Log.Error("error retrieving token for environment %v %v", projectName, err)
 		return err
 	}
 	client, err := rest.NewDynatraceClient(environment.GetEnvironmentUrl(), token)
 	if err != nil {
-		util.Log.Error("error creating dynatrace client for enviroment %v %v", projectName, err)
+		util.Log.Error("error creating dynatrace client for environment %v %v", projectName, err)
 		return err
 	}
 
