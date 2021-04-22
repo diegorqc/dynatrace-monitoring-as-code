@@ -164,6 +164,10 @@ func isDefaultEntity(apiID string, dat map[string]interface{}) bool {
 	case "synthetic-monitor":
 		return false
 	case "extension":
+		id := dat["id"].(string)
+		if strings.Contains(id, "dynatrace.") {
+			return true
+		}
 		return false
 	case "aws-credentials":
 		return false
