@@ -22,3 +22,5 @@ When using download functionality you will only be able to update existing appli
 
 
 
+##### Extensions:
+Currently extension is not supported since this would require additional endpoints to download the related plugins

@@ -71,7 +71,7 @@ func getConfigs(fs afero.Fs, workingDir string, environments map[string]environm
 //returns the list of API filter if the download specific flag is used, otherwise returns all the API's
 func getAPIList(downloadSpecificAPI string) (filterAPIList map[string]api.Api, err error) {
 	availableApis := api.NewApis()
-	availableApis = removeDeprecatedApis(availableApis)
+	availableApis = filterAvailableApis(availableApis)
 	noFilterAPIListProvided := strings.TrimSpace(downloadSpecificAPI) == ""
 
 	if noFilterAPIListProvided {
@@ -98,9 +98,12 @@ func getAPIList(downloadSpecificAPI string) (filterAPIList map[string]api.Api, e
 	return filterAPIList, nil
 }
 
-//removeDeprecatedApis removes from the list the apis that shouldn't be used for download
-func removeDeprecatedApis(apis map[string]api.Api) map[string]api.Api {
+//filterAvailableApis removes from the list the apis that shouldn't be used for download
+func filterAvailableApis(apis map[string]api.Api) map[string]api.Api {
+	//deprecated
 	delete(apis, "application")
+	//not supported, waiting for api v2
+	delete(apis, "extension")
 	return apis
 }
 func isNotDeprecated(api string) bool {
